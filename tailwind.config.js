@@ -2,7 +2,12 @@
 module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        handwritten: ["Reenie Beanie", "cursive"],
+        handwrittenTitle: ["Homemade Apple", "cursive"],
+      },
+    },
   },
   plugins: [],
 };

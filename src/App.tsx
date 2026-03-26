@@ -168,7 +168,7 @@ export default function App(): React.JSX.Element {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#10231d] to-[#0f1d19] p-6 text-white">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">The Easter Mystery</h1>
+        <h1 className="text-3xl font-bold">Påskemysteriet</h1>
         <p className="text-gray-300">Solve all 6 levels to unlock the final.</p>
         <p className="mt-2 text-sm">Progress: {completedCount}/6</p>
       </div>

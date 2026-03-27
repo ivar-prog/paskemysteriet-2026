@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { GameDefinition } from "../types/game";
 import SudokuGame from "./games/SudokuGame";
+import NonogramGame from "./games/NonogramGame";
 
 type Props = {
   game: GameDefinition | null;
@@ -77,6 +78,8 @@ export default function GameUnlockModal({
           <>
             {game.id === "hamburger" ? (
               <SudokuGame onSolved={() => onComplete(game.id)} />
+            ) : game.id === "ear" ? (
+              <NonogramGame onSolved={() => onComplete(game.id)} />
             ) : (
               <>
                 <p className="mb-4 text-stone-700">

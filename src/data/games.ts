@@ -1,5 +1,5 @@
 import { Brain, Hamburger, School, Star, Volleyball, Leaf } from "lucide-react";
-import { GameDefinition, GameId, GameProgress } from "../types/game";
+import { GameDefinition, GameProgress } from "../types/game";
 
 export const GAMES: GameDefinition[] = [
   { id: "brain", title: "Brain", code: "HULK", icon: Brain },

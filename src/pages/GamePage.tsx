@@ -9,8 +9,13 @@ import { GameDefinition } from "../types/game";
 
 export default function GamePage(): React.JSX.Element {
   const navigate = useNavigate();
-  const { progress, unlockGame, completeGame, resetProgress } =
-    useGameProgress();
+  const {
+    progress,
+    unlockGame,
+    completeGame,
+    resetProgress,
+    completeAllGames,
+  } = useGameProgress();
   const [selectedGame, setSelectedGame] = useState<GameDefinition | null>(null);
 
   return (
@@ -32,6 +37,13 @@ export default function GamePage(): React.JSX.Element {
         className="fixed top-16 right-4 z-50 rounded-lg bg-red-700 px-4 py-2 text-sm text-white shadow-lg transition hover:bg-red-800"
       >
         Reset localStorage
+      </button>
+      <button
+        type="button"
+        onClick={completeAllGames}
+        className="fixed top-28 right-4 z-50 rounded-lg bg-green-700 px-4 py-2 text-sm text-white shadow-lg transition hover:bg-green-800"
+      >
+        Complete all games
       </button>
 
       <div className="flex h-[calc(100vh-40px)] items-center justify-center overflow-hidden px-2 py-2 sm:px-4 sm:py-4">
@@ -78,7 +90,7 @@ export default function GamePage(): React.JSX.Element {
                     <strong>Les nøye.</strong> Tenk smart. Og stol på hverandre.
                   </p>
                   <p>Lykke til.</p>
-                  <p>— Nerskogenha...</p>
+                  <p>— Påskeharen</p>
                 </div>
 
                 <div className="mt-8 grid grid-cols-3 gap-4 px-4 md:flex md:justify-between">

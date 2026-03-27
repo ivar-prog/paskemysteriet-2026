@@ -53,11 +53,23 @@ export function useGameProgress() {
     [progress]
   );
 
+  function completeAllGames() {
+    setProgress({
+      brain: { unlocked: true, completed: true },
+      hamburger: { unlocked: true, completed: true },
+      school: { unlocked: true, completed: true },
+      star: { unlocked: true, completed: true },
+      volleyball: { unlocked: true, completed: true },
+      leaf: { unlocked: true, completed: true },
+    });
+  }
+
   return {
     progress,
     unlockGame,
     completeGame,
     resetProgress,
     completedCount,
+    completeAllGames,
   };
 }

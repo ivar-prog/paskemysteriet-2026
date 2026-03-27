@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 type ColorConnectionsGameProps = {
   onSolved: () => void;
@@ -112,7 +112,6 @@ export default function ColorConnectionsGame({
   const [paths, setPaths] = useState<PathsState>(createInitialPaths);
   const [activeColor, setActiveColor] = useState<ColorId | null>(null);
   const [message, setMessage] = useState("");
-  const boardRef = useRef<HTMLDivElement | null>(null);
 
   const endpointMap = useMemo(() => {
     const map = new Map<string, { colorId: ColorId; isStart: boolean }>();
@@ -398,14 +397,13 @@ export default function ColorConnectionsGame({
         tapping the end of an unfinished line.
       </p>
 
-      <div className="mx-auto w-fit rounded-xl border border-stone-500 bg-[#58685b] p-2 shadow-lg">
+      <div className="mx-auto w-fit max-w-full rounded-xl border border-stone-500 bg-[#58685b] p-2 shadow-lg">
         <div
-          ref={boardRef}
           onPointerMove={handleBoardPointerMove}
           className="grid touch-none select-none"
           style={{
-            gridTemplateColumns: `repeat(${GRID_SIZE}, 3.2rem)`,
-            gridTemplateRows: `repeat(${GRID_SIZE}, 3.2rem)`,
+            gridTemplateColumns: "repeat(9, min(9vw, 3.2rem))",
+            gridTemplateRows: "repeat(9, min(9vw, 3.2rem))",
             touchAction: "none",
           }}
         >

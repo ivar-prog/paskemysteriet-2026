@@ -36,7 +36,7 @@ export default function GameUnlockModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
       <div className="w-full max-w-fit rounded-2xl bg-[#f4ead2] p-6 text-black shadow-2xl relative">
         <button
           type="button"

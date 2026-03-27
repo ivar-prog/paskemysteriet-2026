@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { GameDefinition } from "../types/game";
+import SudokuGame from "./games/SudokuGame";
 
 type Props = {
   game: GameDefinition | null;
@@ -52,14 +53,14 @@ export default function GameUnlockModal({
         {!isUnlocked ? (
           <>
             <p className="mb-4 text-sm text-stone-700">
-              Skriv inn koden for å låse opp.
+              Enter the password to unlock this game.
             </p>
 
             <input
               value={value}
               onChange={(e) => setValue(e.target.value)}
               className="w-full rounded-lg border border-stone-400 bg-white px-3 py-2"
-              placeholder="Fyll inn kode"
+              placeholder="Enter code"
             />
 
             <button
@@ -67,24 +68,30 @@ export default function GameUnlockModal({
               onClick={handleUnlock}
               className="mt-3 rounded-lg bg-stone-900 px-4 py-2 text-white transition hover:bg-black"
             >
-              Lås opp
+              Unlock
             </button>
 
             {feedback && <p className="mt-3 text-sm">{feedback}</p>}
           </>
         ) : (
           <>
-            <p className="mb-4 text-stone-700">
-              This is where the actual game will go.
-            </p>
+            {game.id === "hamburger" ? (
+              <SudokuGame onSolved={() => onComplete(game.id)} />
+            ) : (
+              <>
+                <p className="mb-4 text-stone-700">
+                  This is where the actual game will go.
+                </p>
 
-            <button
-              type="button"
-              onClick={() => onComplete(game.id)}
-              className="rounded-lg bg-green-700 px-4 py-2 text-white transition hover:bg-green-800"
-            >
-              Mark game as completed
-            </button>
+                <button
+                  type="button"
+                  onClick={() => onComplete(game.id)}
+                  className="rounded-lg bg-green-700 px-4 py-2 text-white transition hover:bg-green-800"
+                >
+                  Mark game as completed
+                </button>
+              </>
+            )}
           </>
         )}
       </div>

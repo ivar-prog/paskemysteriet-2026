@@ -83,8 +83,8 @@ export default function GamePage(): React.JSX.Element {
                   <br />
                   <p>
                     Nå er det opp til dere. Dere må følge sporene jeg har lagt
-                    igjen. Ingen av gåtene kan løses alene – dere trenger
-                    hverandre.
+                    igjen. Dere trenger hverandre for å løse alle gåtene. Alt
+                    vil åpenbare seg for dere etterhvert.
                   </p>
                   <p>
                     <strong>Les nøye.</strong> Tenk smart. Og stol på hverandre.

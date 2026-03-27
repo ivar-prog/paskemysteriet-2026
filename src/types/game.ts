@@ -1,12 +1,12 @@
 import { LucideIcon } from "lucide-react";
 
 export type GameId =
-  | "brain"
   | "hamburger"
-  | "school"
-  | "star"
-  | "volleyball"
-  | "leaf";
+  | "ear"
+  | "cigarette"
+  | "cup"
+  | "plug"
+  | "train";
 
 export type GameDefinition = {
   id: GameId;

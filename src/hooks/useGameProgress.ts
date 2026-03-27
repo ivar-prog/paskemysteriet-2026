@@ -55,12 +55,12 @@ export function useGameProgress() {
 
   function completeAllGames() {
     setProgress({
-      brain: { unlocked: true, completed: true },
       hamburger: { unlocked: true, completed: true },
-      school: { unlocked: true, completed: true },
-      star: { unlocked: true, completed: true },
-      volleyball: { unlocked: true, completed: true },
-      leaf: { unlocked: true, completed: true },
+      ear: { unlocked: true, completed: true },
+      cigarette: { unlocked: true, completed: true },
+      cup: { unlocked: true, completed: true },
+      plug: { unlocked: true, completed: true },
+      train: { unlocked: true, completed: true },
     });
   }
 

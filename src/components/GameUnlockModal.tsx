@@ -23,7 +23,7 @@ export default function GameUnlockModal({
 
   function handleUnlock() {
     if (value.trim().toUpperCase() !== game?.code.toUpperCase()) {
-      setFeedback("Not quite right yet. Try again.");
+      setFeedback("Dessverre ikke riktig. Har du løst alle gåtene?");
       return;
     }
 
@@ -34,20 +34,32 @@ export default function GameUnlockModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
-      <div className="w-full max-w-md rounded-2xl bg-[#f4ead2] p-6 text-black shadow-2xl">
+      <div className="w-full max-w-md rounded-2xl bg-[#f4ead2] p-6 text-black shadow-2xl relative">
+        <button
+          type="button"
+          onClick={() => {
+            onClose();
+            setFeedback("");
+            setValue("");
+          }}
+          className="absolute top-4 right-4 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-black/70 text-lg text-white transition hover:bg-red-600"
+          aria-label="Close"
+        >
+          ✕
+        </button>
         <h2 className="mb-2 text-2xl font-semibold">{game.title}</h2>
 
         {!isUnlocked ? (
           <>
             <p className="mb-4 text-sm text-stone-700">
-              Enter the password to unlock this game.
+              Skriv inn koden for å låse opp.
             </p>
 
             <input
               value={value}
               onChange={(e) => setValue(e.target.value)}
               className="w-full rounded-lg border border-stone-400 bg-white px-3 py-2"
-              placeholder="Enter code"
+              placeholder="Fyll inn kode"
             />
 
             <button
@@ -55,7 +67,7 @@ export default function GameUnlockModal({
               onClick={handleUnlock}
               className="mt-3 rounded-lg bg-stone-900 px-4 py-2 text-white transition hover:bg-black"
             >
-              Unlock
+              Lås opp
             </button>
 
             {feedback && <p className="mt-3 text-sm">{feedback}</p>}
@@ -75,14 +87,6 @@ export default function GameUnlockModal({
             </button>
           </>
         )}
-
-        <button
-          type="button"
-          onClick={onClose}
-          className="mt-4 text-sm underline"
-        >
-          Close
-        </button>
       </div>
     </div>
   );

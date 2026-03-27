@@ -1,22 +1,29 @@
-import { Brain, Hamburger, School, Star, Volleyball, Leaf } from "lucide-react";
+import {
+  Hamburger,
+  Ear,
+  Cigarette,
+  CupSoda,
+  PlugZap,
+  TrainFront,
+} from "lucide-react";
 import { GameDefinition, GameProgress } from "../types/game";
 
 export const GAMES: GameDefinition[] = [
-  { id: "brain", title: "Brain", code: "HULK", icon: Brain },
-  { id: "hamburger", title: "Hamburger", code: "BURGER", icon: Hamburger },
-  { id: "school", title: "School", code: "SCHOOL", icon: School },
-  { id: "star", title: "Star", code: "STAR", icon: Star },
-  { id: "volleyball", title: "Volleyball", code: "BALL", icon: Volleyball },
-  { id: "leaf", title: "Leaf", code: "LEAF", icon: Leaf },
+  { id: "hamburger", title: "Burger", code: "BURGER", icon: Hamburger },
+  { id: "ear", title: "Overhøre", code: "HULK", icon: Ear },
+  { id: "cigarette", title: "Røyk", code: "SCHOOL", icon: Cigarette },
+  { id: "cup", title: "Drikke", code: "STAR", icon: CupSoda },
+  { id: "plug", title: "Elektrisitet", code: "BALL", icon: PlugZap },
+  { id: "train", title: "Tog", code: "LEAF", icon: TrainFront },
 ];
 
 export const DEFAULT_PROGRESS: GameProgress = {
-  brain: { unlocked: false, completed: false },
   hamburger: { unlocked: false, completed: false },
-  school: { unlocked: false, completed: false },
-  star: { unlocked: false, completed: false },
-  volleyball: { unlocked: false, completed: false },
-  leaf: { unlocked: false, completed: false },
+  ear: { unlocked: false, completed: false },
+  cigarette: { unlocked: false, completed: false },
+  cup: { unlocked: false, completed: false },
+  plug: { unlocked: false, completed: false },
+  train: { unlocked: false, completed: false },
 };
 
 export const GAME_PROGRESS_KEY = "easter-game-progress";

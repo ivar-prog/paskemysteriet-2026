@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 type ColorConnectionsGameProps = {
   onSolved: () => void;
@@ -112,15 +112,7 @@ export default function ColorConnectionsGame({
   const [paths, setPaths] = useState<PathsState>(createInitialPaths);
   const [activeColor, setActiveColor] = useState<ColorId | null>(null);
   const [message, setMessage] = useState("");
-
-  useEffect(() => {
-    function handlePointerUp(): void {
-      setActiveColor(null);
-    }
-
-    window.addEventListener("pointerup", handlePointerUp);
-    return () => window.removeEventListener("pointerup", handlePointerUp);
-  }, []);
+  const boardRef = useRef<HTMLDivElement | null>(null);
 
   const endpointMap = useMemo(() => {
     const map = new Map<string, { colorId: ColorId; isStart: boolean }>();
@@ -131,6 +123,20 @@ export default function ColorConnectionsGame({
     }
 
     return map;
+  }, []);
+
+  useEffect(() => {
+    function handlePointerUp(): void {
+      setActiveColor(null);
+    }
+
+    window.addEventListener("pointerup", handlePointerUp);
+    window.addEventListener("pointercancel", handlePointerUp);
+
+    return () => {
+      window.removeEventListener("pointerup", handlePointerUp);
+      window.removeEventListener("pointercancel", handlePointerUp);
+    };
   }, []);
 
   function getPair(colorId: ColorId): PairDefinition | undefined {
@@ -206,7 +212,7 @@ export default function ColorConnectionsGame({
     setMessage("");
   }
 
-  function handleEnter(cell: Position): void {
+  function extendPathToCell(cell: Position): void {
     if (!activeColor) return;
 
     setPaths((prev) => {
@@ -256,6 +262,38 @@ export default function ColorConnectionsGame({
         [activeColor]: [...currentPath, cell],
       };
     });
+  }
+
+  function getCellFromPoint(clientX: number, clientY: number): Position | null {
+    const element = document.elementFromPoint(
+      clientX,
+      clientY
+    ) as HTMLElement | null;
+    if (!element) return null;
+
+    const cellElement = element.closest("[data-cell]") as HTMLElement | null;
+    if (!cellElement) return null;
+
+    const row = cellElement.dataset.row;
+    const col = cellElement.dataset.col;
+
+    if (row == null || col == null) return null;
+
+    return {
+      row: Number(row),
+      col: Number(col),
+    };
+  }
+
+  function handleBoardPointerMove(
+    event: React.PointerEvent<HTMLDivElement>
+  ): void {
+    if (!activeColor) return;
+
+    const cell = getCellFromPoint(event.clientX, event.clientY);
+    if (!cell) return;
+
+    extendPathToCell(cell);
   }
 
   const connectedColors = useMemo(() => {
@@ -357,15 +395,18 @@ export default function ColorConnectionsGame({
     <div className="space-y-4">
       <p className="text-sm text-stone-700">
         Drag between matching colors. You can stop halfway and continue later by
-        clicking the end of an unfinished line.
+        tapping the end of an unfinished line.
       </p>
 
       <div className="mx-auto w-fit rounded-xl border border-stone-500 bg-[#58685b] p-2 shadow-lg">
         <div
-          className="grid"
+          ref={boardRef}
+          onPointerMove={handleBoardPointerMove}
+          className="grid touch-none select-none"
           style={{
             gridTemplateColumns: `repeat(${GRID_SIZE}, 3.2rem)`,
             gridTemplateRows: `repeat(${GRID_SIZE}, 3.2rem)`,
+            touchAction: "none",
           }}
         >
           {Array.from({ length: GRID_SIZE }).map((_, row) =>
@@ -379,7 +420,9 @@ export default function ColorConnectionsGame({
               return (
                 <div
                   key={`${row}-${col}`}
-                  onPointerEnter={() => handleEnter(cell)}
+                  data-cell="true"
+                  data-row={row}
+                  data-col={col}
                   className="relative border border-[#8d8f56] bg-[#6d7867]"
                 >
                   {pair && (
@@ -431,7 +474,8 @@ export default function ColorConnectionsGame({
                   {endpoint ? (
                     <button
                       type="button"
-                      onPointerDown={() => {
+                      onPointerDown={(event) => {
+                        event.preventDefault();
                         const pairDef = getPair(endpoint.colorId);
                         if (!pairDef) return;
 
@@ -440,7 +484,8 @@ export default function ColorConnectionsGame({
                           endpoint.isStart ? pairDef.start : pairDef.end
                         );
                       }}
-                      className="absolute inset-0 z-10 flex items-center justify-center"
+                      className="absolute inset-0 z-10 flex items-center justify-center touch-none"
+                      style={{ touchAction: "none" }}
                       aria-label={`Start ${endpoint.colorId} path`}
                     >
                       <div
@@ -454,8 +499,12 @@ export default function ColorConnectionsGame({
                   ) : tailColor ? (
                     <button
                       type="button"
-                      onPointerDown={() => handleActivatePath(tailColor, cell)}
-                      className="absolute inset-0 z-10"
+                      onPointerDown={(event) => {
+                        event.preventDefault();
+                        handleActivatePath(tailColor, cell);
+                      }}
+                      className="absolute inset-0 z-10 touch-none"
+                      style={{ touchAction: "none" }}
                       aria-label={`Continue ${tailColor} path`}
                     />
                   ) : null}

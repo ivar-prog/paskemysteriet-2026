@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { GameDefinition } from "../types/game";
 import SudokuGame from "./games/SudokuGame";
 import NonogramGame from "./games/NonogramGame";
+import ColorConnectionsGame from "./games/ColorConnectionsGame";
 
 type Props = {
   game: GameDefinition | null;
@@ -36,7 +37,7 @@ export default function GameUnlockModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
-      <div className="w-full max-w-md rounded-2xl bg-[#f4ead2] p-6 text-black shadow-2xl relative">
+      <div className="w-full max-w-fit rounded-2xl bg-[#f4ead2] p-6 text-black shadow-2xl relative">
         <button
           type="button"
           onClick={() => {
@@ -53,15 +54,11 @@ export default function GameUnlockModal({
 
         {!isUnlocked ? (
           <>
-            <p className="mb-4 text-sm text-stone-700">
-              Enter the password to unlock this game.
-            </p>
-
             <input
               value={value}
               onChange={(e) => setValue(e.target.value)}
               className="w-full rounded-lg border border-stone-400 bg-white px-3 py-2"
-              placeholder="Enter code"
+              placeholder="Skriv inn koden.."
             />
 
             <button
@@ -69,7 +66,7 @@ export default function GameUnlockModal({
               onClick={handleUnlock}
               className="mt-3 rounded-lg bg-stone-900 px-4 py-2 text-white transition hover:bg-black"
             >
-              Unlock
+              Lås opp
             </button>
 
             {feedback && <p className="mt-3 text-sm">{feedback}</p>}
@@ -80,6 +77,8 @@ export default function GameUnlockModal({
               <SudokuGame onSolved={() => onComplete(game.id)} />
             ) : game.id === "ear" ? (
               <NonogramGame onSolved={() => onComplete(game.id)} />
+            ) : game.id === "plug" ? (
+              <ColorConnectionsGame onSolved={() => onComplete(game.id)} />
             ) : (
               <>
                 <p className="mb-4 text-stone-700">

@@ -10,7 +10,7 @@ export default function LandingPage(): React.JSX.Element {
       <div className="relative min-h-screen flex flex-col items-center justify-center text-white">
         {/* Content */}
         <div className="relative z-10 flex flex-col items-center">
-          <h1 className="text-8xl font-bold font-serif text-[#253729] mb-10 text-center">
+          <h1 className="text-4xl md:text-6xl font-bold font-serif text-[#253729] mb-10 text-center">
             Påskemysteriet på Nerskogen
           </h1>
 

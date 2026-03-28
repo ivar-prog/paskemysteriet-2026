@@ -99,7 +99,7 @@ export default function SudokuGame({
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-stone-700">
+      <p className="text-sm text-stone-700 md:max-w-[600px]">
         Fyll inn Sudokuen. De grønne tallene er låst. Når du tror du er ferdig,
         trykk <span className="font-semibold">Sjekk svar</span>.
       </p>

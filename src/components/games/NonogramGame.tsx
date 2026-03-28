@@ -70,7 +70,7 @@ export default function NonogramGame({
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-stone-700">
+      <p className="text-sm text-stone-700 md:max-w-[600px]">
         Klikk én gang for å fylle en rute, én gang til for å markere den med X,
         og én gang til for å tømme den igjen.
       </p>

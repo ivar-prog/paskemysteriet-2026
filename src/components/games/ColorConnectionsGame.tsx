@@ -392,7 +392,7 @@ export default function ColorConnectionsGame({
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-stone-700">
+      <p className="text-sm text-stone-700 md:max-w-[600px]">
         Drag between matching colors. You can stop halfway and continue later by
         tapping the end of an unfinished line.
       </p>

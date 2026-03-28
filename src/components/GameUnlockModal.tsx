@@ -3,6 +3,9 @@ import { GameDefinition } from "../types/game";
 import SudokuGame from "./games/SudokuGame";
 import NonogramGame from "./games/NonogramGame";
 import ColorConnectionsGame from "./games/ColorConnectionsGame";
+import PipePuzzleGame from "./games/PipePuzzleGame";
+import BlockEscapeGame from "./games/BlockEscapeGame";
+import BinairoGame from "./games/BinaroGame";
 
 type Props = {
   game: GameDefinition | null;
@@ -79,6 +82,12 @@ export default function GameUnlockModal({
               <NonogramGame onSolved={() => onComplete(game.id)} />
             ) : game.id === "plug" ? (
               <ColorConnectionsGame onSolved={() => onComplete(game.id)} />
+            ) : game.id === "cup" ? (
+              <PipePuzzleGame onSolved={() => onComplete(game.id)} />
+            ) : game.id === "cigarette" ? (
+              <BlockEscapeGame onSolved={() => onComplete(game.id)} />
+            ) : game.id === "train" ? (
+              <BinairoGame onSolved={() => onComplete(game.id)} />
             ) : (
               <>
                 <p className="mb-4 text-stone-700">

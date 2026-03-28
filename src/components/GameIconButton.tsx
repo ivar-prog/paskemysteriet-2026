@@ -25,7 +25,7 @@ export default function GameIconButton({
         hover:scale-105 hover:bg-black/5
         ${
           state.completed
-            ? "border-green-600 bg-green-100/70 pointer-events-none"
+            ? "border-green-600 bg-green-100/70"
             : state.unlocked
             ? "border-stone-700 bg-stone-100/50"
             : "border-stone-700 bg-transparent"

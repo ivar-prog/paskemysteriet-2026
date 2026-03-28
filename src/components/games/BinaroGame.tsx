@@ -15,7 +15,7 @@ type Constraint = {
 };
 
 const GRID_SIZE = 8;
-const CELL_SIZE = 64;
+// const CELL_SIZE = 64;
 
 const START_BOARD: CellState[][] = [
   ["empty", "black", "empty", "empty", "white", "empty", "empty", "empty"],
@@ -28,7 +28,7 @@ const START_BOARD: CellState[][] = [
   ["empty", "empty", "empty", "white", "empty", "empty", "black", "empty"],
 ];
 
-const SOLUTION: CellState[][] = [
+/* const SOLUTION: CellState[][] = [
   ["black", "black", "white", "black", "white", "black", "white", "white"],
   ["white", "white", "black", "black", "white", "white", "black", "black"],
   ["white", "black", "white", "white", "black", "black", "white", "black"],
@@ -37,7 +37,7 @@ const SOLUTION: CellState[][] = [
   ["white", "black", "white", "black", "white", "black", "black", "white"],
   ["black", "white", "black", "white", "black", "white", "white", "black"],
   ["white", "black", "black", "white", "black", "white", "black", "white"],
-];
+]; */
 
 const CONSTRAINTS: Constraint[] = [
   { row: 1, col: 0, direction: "vertical", type: "equal" },

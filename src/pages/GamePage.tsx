@@ -29,7 +29,7 @@ export default function GamePage(): React.JSX.Element {
       >
         ✕
       </button>
-      <button
+      {/* <button
         type="button"
         onClick={() => {
           localStorage.removeItem("started");
@@ -45,7 +45,7 @@ export default function GamePage(): React.JSX.Element {
         className="fixed top-28 right-4 z-50 rounded-lg bg-green-700 px-4 py-2 text-sm text-white shadow-lg transition hover:bg-green-800"
       >
         Complete all games
-      </button>
+      </button> */}
 
       <div className="flex h-[calc(100vh-40px)] items-center justify-center overflow-hidden px-2 py-2 sm:px-4 sm:py-4">
         <div className="relative w-full max-w-[600px]">

@@ -71,8 +71,10 @@ export default function NonogramGame({
   return (
     <div className="space-y-4">
       <p className="text-sm text-stone-700 md:max-w-[600px]">
-        Klikk én gang for å fylle en rute, én gang til for å markere den med X,
-        og én gang til for å tømme den igjen.
+        Tallene ved hver rad og kolonne viser hvor mange sammenhengende fylte
+        ruter det skal være. Tallene står i rekkefølge og må ha minst én tom
+        rute mellom seg. Klikk én gang for å fylle en rute, én gang til for å
+        markere den med X, og én gang til for å tømme den igjen.
       </p>
 
       <div className="overflow-x-auto">
@@ -210,7 +212,7 @@ export default function NonogramGame({
           onClick={checkAnswer}
           className="rounded bg-stone-900 px-4 py-2 text-white transition hover:bg-black"
         >
-          Check answer
+          Sjekk svar
         </button>
 
         {message && <p className="text-sm text-stone-700">{message}</p>}

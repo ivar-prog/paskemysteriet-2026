@@ -341,7 +341,7 @@ export default function PipePuzzleGame({
           onClick={checkAnswer}
           className="rounded bg-stone-900 px-4 py-2 text-white transition hover:bg-black"
         >
-          Check answer
+          Sjekk svar
         </button>
 
         {message && <p className="text-sm text-stone-700">{message}</p>}

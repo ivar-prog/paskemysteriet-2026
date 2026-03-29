@@ -9,12 +9,12 @@ import {
 import { GameDefinition, GameProgress } from "../types/game";
 
 export const GAMES: GameDefinition[] = [
-  { id: "hamburger", title: "Burger", code: "BURGER", icon: Hamburger },
-  { id: "ear", title: "Overhøre", code: "HULK", icon: Ear },
-  { id: "cigarette", title: "Røyk", code: "SCHOOL", icon: Cigarette },
-  { id: "cup", title: "Drikke", code: "STAR", icon: CupSoda },
-  { id: "plug", title: "Elektrisitet", code: "BALL", icon: PlugZap },
-  { id: "train", title: "Tog", code: "LEAF", icon: TrainFront },
+  { id: "hamburger", title: "Burger", code: "HULK", icon: Hamburger },
+  { id: "ear", title: "Overhøre", code: "HÅNDKLE", icon: Ear },
+  { id: "cigarette", title: "Røyk", code: "RABALDER", icon: Cigarette },
+  { id: "cup", title: "Drikke", code: "PARACHUTES", icon: CupSoda },
+  { id: "plug", title: "Elektrisitet", code: "BAMSE", icon: PlugZap },
+  { id: "train", title: "Tog", code: "BERKELIUM", icon: TrainFront },
 ];
 
 export const DEFAULT_PROGRESS: GameProgress = {

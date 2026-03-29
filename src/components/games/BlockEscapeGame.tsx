@@ -348,7 +348,7 @@ export default function BlockEscapeGame({
           onClick={resetGame}
           className="rounded bg-stone-900 px-4 py-2 text-white transition hover:bg-black"
         >
-          Reset
+          Tilbakestill
         </button>
 
         {message && <p className="text-sm text-stone-700">{message}</p>}
@@ -399,20 +399,8 @@ export default function BlockEscapeGame({
               top: "0px",
               width: `${exitWidth}px`,
               height: `${BOARD_PADDING + EXIT_HEIGHT + 2}px`,
-              borderBottomLeftRadius: "20px",
-              borderBottomRightRadius: "20px",
-            }}
-          />
-
-          <div
-            className="absolute z-[2] bg-[linear-gradient(to_bottom,#d6a15a,#b67c3c)] shadow-[inset_0_2px_4px_rgba(255,255,255,0.2)]"
-            style={{
-              left: `${exitLeft + 6}px`,
-              top: "0px",
-              width: `${exitWidth - 12}px`,
-              height: `${EXIT_HEIGHT + 10}px`,
-              borderBottomLeftRadius: "16px",
-              borderBottomRightRadius: "16px",
+              borderBottomLeftRadius: "0px",
+              borderBottomRightRadius: "0px",
             }}
           />
 

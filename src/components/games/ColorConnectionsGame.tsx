@@ -21,6 +21,7 @@ type ColorId =
 
 type PairDefinition = {
   id: ColorId;
+  name: string;
   color: string;
   start: Position;
   end: Position;
@@ -33,48 +34,56 @@ const GRID_SIZE = 9;
 const PAIRS: PairDefinition[] = [
   {
     id: "blue",
+    name: "Blå",
     color: "#1d26ff",
     start: { row: 0, col: 0 },
     end: { row: 1, col: 8 },
   },
   {
     id: "green",
+    name: "Grønn",
     color: "#029a00",
     start: { row: 1, col: 0 },
     end: { row: 7, col: 4 },
   },
   {
     id: "cyan",
+    name: "Lyseblå",
     color: "#20e7ef",
     start: { row: 2, col: 3 },
     end: { row: 8, col: 8 },
   },
   {
     id: "pink",
+    name: "Rosa",
     color: "#ff16f4",
     start: { row: 1, col: 5 },
     end: { row: 1, col: 7 },
   },
   {
     id: "orange",
+    name: "Oransje",
     color: "#ff9500",
     start: { row: 3, col: 5 },
     end: { row: 2, col: 8 },
   },
   {
     id: "brown",
+    name: "Brun",
     color: "#a7362f",
     start: { row: 5, col: 2 },
     end: { row: 6, col: 4 },
   },
   {
     id: "red",
+    name: "Rød",
     color: "#ff1b13",
     start: { row: 4, col: 7 },
     end: { row: 6, col: 7 },
   },
   {
     id: "yellow",
+    name: "Gul",
     color: "#f4ef00",
     start: { row: 6, col: 2 },
     end: { row: 6, col: 6 },
@@ -393,8 +402,8 @@ export default function ColorConnectionsGame({
   return (
     <div className="space-y-4">
       <p className="text-sm text-stone-700 md:max-w-[600px]">
-        Drag between matching colors. You can stop halfway and continue later by
-        tapping the end of an unfinished line.
+        Dra et rør mellom matchende farger. Du kan stoppe halvveis og fortsette
+        senere ved å trykke på enden av en ufullført linje.
       </p>
 
       <div className="mx-auto w-fit max-w-full rounded-xl border border-stone-500 bg-[#58685b] p-2 shadow-lg">
@@ -519,11 +528,11 @@ export default function ColorConnectionsGame({
             key={pair.id}
             className={`rounded-full px-3 py-1 text-sm ${
               connectedColors[pair.id]
-                ? "bg-green-100 text-green-800"
+                ? "bg-green-600 text-white"
                 : "bg-stone-200 text-stone-700"
             }`}
           >
-            {pair.id}
+            {pair.name}
           </div>
         ))}
       </div>

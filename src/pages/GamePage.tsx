@@ -15,6 +15,7 @@ export default function GamePage(): React.JSX.Element {
     completeGame,
     resetProgress,
     completeAllGames,
+    allCompleted,
   } = useGameProgress();
   const [selectedGame, setSelectedGame] = useState<GameDefinition | null>(null);
 
@@ -63,34 +64,68 @@ export default function GamePage(): React.JSX.Element {
                 </h1>
 
                 <div className="font-handwritten text-lg leading-[1.45] text-black sm:text-[1.2rem] md:text-[1.2rem]">
-                  <p>Utrolig nok gikk ikke alt etter planen min.</p>
-                  <p>Noen fant ut hva jeg hadde skjult, og de kom etter meg.</p>
-                  <p>De trodde de kunne få tak i eggene uten problemer.</p>
-                  <p>
-                    En ting de ikke forsto, var hvor godt jeg hadde forberedt
-                    meg.
-                  </p>
-                  <p>Raskt måtte jeg gjemme alt før de fant meg.</p>
-                  <br />
-                  <p>Bare én ting var sikkert – eggene måtte holdes skjult.</p>
-                  <p>Om de fikk tak i dem, ville alt være tapt.</p>
-                  <p>Riktig nok lette de overalt i huset.</p>
-                  <p>
-                    De åpnet skuffer, flyttet på ting og snudde alt opp ned.
-                  </p>
-                  <p>En etter en ga de opp, frustrerte og sinte.</p>
-                  <p>Til slutt tok de meg med seg, men eggene fant de aldri.</p>
-                  <br />
-                  <p>
-                    Nå er det opp til dere. Dere må følge sporene jeg har lagt
-                    igjen. Dere trenger hverandre for å løse alle gåtene. Alt
-                    vil åpenbare seg for dere etterhvert.
-                  </p>
-                  <p>
-                    <strong>Les nøye.</strong> Tenk smart. Og stol på hverandre.
-                  </p>
-                  <p>Lykke til.</p>
-                  <p>— Påskeharen</p>
+                  {allCompleted ? (
+                    <>
+                      <p>Dere klarte det.</p>
+                      <p>Alle sporene ble fulgt. Alle gåtene ble løst.</p>
+                      <p>Jeg må innrømme… jeg er imponert.</p>
+                      <p>
+                        De som tok meg trodde de hadde vunnet.
+                        <br /> De lette overalt, men de forsto aldri hvordan alt
+                        hang sammen.
+                      </p>
+                      <p>Men dere gjorde det.</p>
+                      <p>Dere så det jeg håpet noen ville se.</p>
+                      <p>Nå gjenstår bare én siste ting.</p>
+                      <p>
+                        Eggene er ikke bare gjemt… de er gjemt et sted som hører
+                        til her.
+                      </p>
+                      <p>
+                        <strong>Der vi har ski.</strong>
+                      </p>
+                      <p>Finn riktig sted, og dere vil finne det jeg gjemte.</p>
+                      <p>Lykke til.</p> <p>— Påskeharen</p>
+                    </>
+                  ) : (
+                    <>
+                      <p>Utrolig nok gikk ikke alt etter planen min.</p>
+                      <p>
+                        Noen fant ut hva jeg hadde skjult, og de kom etter meg.
+                      </p>
+                      <p>De trodde de kunne få tak i eggene uten problemer.</p>
+                      <p>
+                        En ting de ikke forsto, var hvor godt jeg hadde
+                        forberedt meg.
+                      </p>
+                      <p>Raskt måtte jeg gjemme alt før de fant meg.</p>
+                      <br />
+                      <p>
+                        Bare én ting var sikkert – eggene måtte holdes skjult.
+                      </p>
+                      <p>Om de fikk tak i dem, ville alt være tapt.</p>
+                      <p>Riktig nok lette de overalt i huset.</p>
+                      <p>
+                        De åpnet skuffer, flyttet på ting og snudde alt opp ned.
+                      </p>
+                      <p>En etter en ga de opp, frustrerte og sinte.</p>
+                      <p>
+                        Til slutt tok de meg med seg, men eggene fant de aldri.
+                      </p>
+                      <br />
+                      <p>
+                        Nå er det opp til dere. Dere må følge sporene jeg har
+                        lagt igjen. Dere trenger hverandre for å løse alle
+                        gåtene. Alt vil åpenbare seg for dere etterhvert.
+                      </p>
+                      <p>
+                        <strong>Les nøye.</strong> Tenk smart. Og stol på
+                        hverandre.
+                      </p>
+                      <p>Lykke til.</p>
+                      <p>— Påskeharen</p>
+                    </>
+                  )}
                 </div>
 
                 <div className="mt-8 grid grid-cols-3 gap-4 px-4 md:flex md:justify-between">

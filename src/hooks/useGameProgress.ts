@@ -53,6 +53,11 @@ export function useGameProgress() {
     [progress]
   );
 
+  const allCompleted = useMemo(
+    () => Object.values(progress).every((item) => item.completed),
+    [progress]
+  );
+
   function completeAllGames() {
     setProgress({
       hamburger: { unlocked: true, completed: true },
@@ -71,5 +76,6 @@ export function useGameProgress() {
     resetProgress,
     completedCount,
     completeAllGames,
+    allCompleted,
   };
 }

@@ -9,14 +9,8 @@ import { GameDefinition } from "../types/game";
 
 export default function GamePage(): React.JSX.Element {
   const navigate = useNavigate();
-  const {
-    progress,
-    unlockGame,
-    completeGame,
-    resetProgress,
-    completeAllGames,
-    allCompleted,
-  } = useGameProgress();
+  const { progress, unlockGame, completeGame, allCompleted } =
+    useGameProgress();
   const [selectedGame, setSelectedGame] = useState<GameDefinition | null>(null);
 
   return (

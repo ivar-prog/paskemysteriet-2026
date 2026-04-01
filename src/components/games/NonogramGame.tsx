@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useState } from "react";
 import GameSuccessOverlay from "../GamesSuccessOverlay";
 
 type NonogramGameProps = {
@@ -39,14 +39,13 @@ export default function NonogramGame({
 }: NonogramGameProps): React.JSX.Element {
   const [board, setBoard] = useState<CellState[][]>(createEmptyBoard);
   const [message, setMessage] = useState("");
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showVictory, setShowVictory] = useState(false);
 
   const maxRowClues = Math.max(...ROW_CLUES.map((row) => row.length));
   const maxColClues = Math.max(...COL_CLUES.map((col) => col.length));
 
   function handleCellClick(row: number, col: number): void {
-    if (showSuccessModal) return;
+    if (showVictory) return;
 
     setBoard((prev) => {
       const next = prev.map((r) => [...r]);
@@ -77,17 +76,6 @@ export default function NonogramGame({
     setShowVictory(false);
     onSolved();
   }
-
-  useEffect(() => {
-    if (!showSuccessModal) return;
-
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [showSuccessModal]);
 
   return (
     <div className="space-y-4">

@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import GameSuccessOverlay from "../GamesSuccessOverlay";
 
 type NonogramGameProps = {
   onSolved: () => void;
@@ -38,11 +39,15 @@ export default function NonogramGame({
 }: NonogramGameProps): React.JSX.Element {
   const [board, setBoard] = useState<CellState[][]>(createEmptyBoard);
   const [message, setMessage] = useState("");
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showVictory, setShowVictory] = useState(false);
 
   const maxRowClues = Math.max(...ROW_CLUES.map((row) => row.length));
   const maxColClues = Math.max(...COL_CLUES.map((col) => col.length));
 
   function handleCellClick(row: number, col: number): void {
+    if (showSuccessModal) return;
+
     setBoard((prev) => {
       const next = prev.map((r) => [...r]);
       next[row][col] = nextCellState(next[row][col]);
@@ -60,13 +65,29 @@ export default function NonogramGame({
     );
 
     if (isCorrect) {
-      setMessage("Riktig! Nonogrammet er løst.");
-      onSolved();
+      setMessage("");
+      setShowVictory(true);
       return;
     }
 
     setMessage("Ikke helt riktig ennå.");
   }
+
+  function handleCloseVictory(): void {
+    setShowVictory(false);
+    onSolved();
+  }
+
+  useEffect(() => {
+    if (!showSuccessModal) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [showSuccessModal]);
 
   return (
     <div className="space-y-4">
@@ -91,11 +112,11 @@ export default function NonogramGame({
             gap: 0,
           }}
         >
-          {/* Top-left spacer */}
           <div />
 
           {/* Top clues */}
           <div
+            className="border-t-2 border-l-2 border-r-2 border-stone-800"
             style={{
               display: "grid",
               gridTemplateColumns: `repeat(${GRID_SIZE}, ${CELL_SIZE}px)`,
@@ -108,15 +129,14 @@ export default function NonogramGame({
                   .fill(null)
                   .concat(clues);
 
-                const thickRight = colIndex === GRID_SIZE - 1;
-
                 return (
                   <div
                     key={`col-${rowIndex}-${colIndex}`}
                     className={[
                       "flex items-end justify-center text-2xl font-semibold text-stone-800",
-                      "border-b border-stone-300",
-                      thickRight ? "border-r-4 border-r-stone-700" : "",
+                      colIndex !== GRID_SIZE - 1
+                        ? "border-r border-stone-800"
+                        : "",
                     ].join(" ")}
                   >
                     {padded[rowIndex] ?? ""}
@@ -128,10 +148,11 @@ export default function NonogramGame({
 
           {/* Left clues */}
           <div
+            className="border-l-2 border-b-2 border-t-2 border-r-2 border-stone-800"
             style={{
               display: "grid",
-              gridTemplateColumns: `repeat(${maxRowClues}, ${CLUE_CELL_SIZE}px)`,
               gridTemplateRows: `repeat(${GRID_SIZE}, ${CELL_SIZE}px)`,
+              width: `${maxRowClues * CLUE_CELL_SIZE}px`,
             }}
           >
             {ROW_CLUES.map((clues, rowIndex) => {
@@ -139,20 +160,30 @@ export default function NonogramGame({
                 .fill(null)
                 .concat(clues);
 
-              const thickBottom = rowIndex === GRID_SIZE - 1;
-
-              return padded.map((clue, clueIndex) => (
+              return (
                 <div
-                  key={`row-${rowIndex}-${clueIndex}`}
+                  key={`row-clues-${rowIndex}`}
                   className={[
-                    "flex items-center justify-center text-2xl font-semibold text-stone-800",
-                    "border-r border-stone-300",
-                    thickBottom ? "border-b-4 border-b-stone-700" : "",
+                    "grid items-center",
+                    rowIndex !== GRID_SIZE - 1
+                      ? "border-b border-stone-800"
+                      : "",
                   ].join(" ")}
+                  style={{
+                    gridTemplateColumns: `repeat(${maxRowClues}, ${CLUE_CELL_SIZE}px)`,
+                    height: `${CELL_SIZE}px`,
+                  }}
                 >
-                  {clue ?? ""}
+                  {padded.map((clue, clueIndex) => (
+                    <div
+                      key={`row-${rowIndex}-${clueIndex}`}
+                      className="flex items-center justify-center text-2xl font-semibold text-stone-800"
+                    >
+                      {clue ?? ""}
+                    </div>
+                  ))}
                 </div>
-              ));
+              );
             })}
           </div>
 
@@ -163,14 +194,14 @@ export default function NonogramGame({
               gridTemplateColumns: `repeat(${GRID_SIZE}, ${CELL_SIZE}px)`,
               gridTemplateRows: `repeat(${GRID_SIZE}, ${CELL_SIZE}px)`,
             }}
-            className="border-r-4 border-b-4 border-stone-700"
+            className="border-r-2 border-b-2 border-stone-800"
           >
             {board.map((row, rowIndex) =>
               row.map((cell, colIndex) => {
                 const isFilled = cell === "filled";
                 const isCrossed = cell === "crossed";
-                const thickRight = colIndex === GRID_SIZE - 1;
-                const thickBottom = rowIndex === GRID_SIZE - 1;
+                const isLastCol = colIndex === GRID_SIZE - 1;
+                const isLastRow = rowIndex === GRID_SIZE - 1;
 
                 return (
                   <button
@@ -178,9 +209,9 @@ export default function NonogramGame({
                     type="button"
                     onClick={() => handleCellClick(rowIndex, colIndex)}
                     className={[
-                      "relative bg-white border-r border-b border-stone-300",
-                      thickRight ? "border-r-0" : "",
-                      thickBottom ? "border-b-0" : "",
+                      "relative bg-white border-r border-b border-stone-800",
+                      isLastCol ? "border-r-0" : "",
+                      isLastRow ? "border-b-0" : "",
                     ].join(" ")}
                     style={{
                       width: `${CELL_SIZE}px`,
@@ -217,6 +248,13 @@ export default function NonogramGame({
 
         {message && <p className="text-sm text-stone-700">{message}</p>}
       </div>
+      <GameSuccessOverlay
+        open={showVictory}
+        title="Gratulerer!"
+        message="Dere løste oppgaven!"
+        buttonText="OK"
+        onClose={handleCloseVictory}
+      />
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import GameSuccessOverlay from "../GamesSuccessOverlay";
 
 type PipePuzzleGameProps = {
   onSolved: () => void;
@@ -264,11 +265,15 @@ export default function PipePuzzleGame({
 }: PipePuzzleGameProps): React.JSX.Element {
   const [board, setBoard] = useState<Tile[][]>(createBoard);
   const [message, setMessage] = useState("");
-  const [hasSolved, setHasSolved] = useState(false);
+  const [showVictory, setShowVictory] = useState(false);
 
   const connected = useMemo(() => getConnectedCells(board), [board]);
 
   function handleTileClick(row: number, col: number): void {
+    if (showVictory) {
+      return;
+    }
+
     setBoard((prev) => {
       const next = prev.map((boardRow) =>
         boardRow.map((tile) => ({ ...tile }))
@@ -283,69 +288,79 @@ export default function PipePuzzleGame({
     const solved = isSolved(board);
 
     if (solved) {
-      setMessage("Riktig! Rørsystemet er koblet sammen.");
-
-      if (!hasSolved) {
-        setHasSolved(true);
-        onSolved();
-      }
-
+      setMessage("");
+      setShowVictory(true);
       return;
     }
 
     setMessage("Ikke helt riktig ennå.");
   }
 
+  function handleCloseVictory(): void {
+    setShowVictory(false);
+    onSolved();
+  }
+
   return (
-    <div className="space-y-4">
-      <p className="text-sm text-stone-700">
-        Klikk på rørene for å rotere dem. Alle rørene må kobles til vannkilden,
-        og blå farge viser hvilke rør som har vann.
-      </p>
+    <>
+      <div className="space-y-4">
+        <p className="text-sm text-stone-700">
+          Klikk på rørene for å rotere dem. Alle rørene må kobles til
+          vannkilden, og blå farge viser hvilke rør som har vann.
+        </p>
 
-      <div className="overflow-x-auto">
-        <div
-          className="mx-auto grid w-fit gap-2 rounded-xl bg-stone-200 p-2"
-          style={{
-            gridTemplateColumns: `repeat(${GRID_SIZE}, ${TILE_SIZE}px)`,
-            gridTemplateRows: `repeat(${GRID_SIZE}, ${TILE_SIZE}px)`,
-          }}
-        >
-          {board.map((row, rowIndex) =>
-            row.map((tile, colIndex) => {
-              const isConnected = connected.has(`${rowIndex}-${colIndex}`);
+        <div className="overflow-x-auto">
+          <div
+            className="mx-auto grid w-fit gap-2 rounded-xl bg-stone-200 p-2"
+            style={{
+              gridTemplateColumns: `repeat(${GRID_SIZE}, ${TILE_SIZE}px)`,
+              gridTemplateRows: `repeat(${GRID_SIZE}, ${TILE_SIZE}px)`,
+            }}
+          >
+            {board.map((row, rowIndex) =>
+              row.map((tile, colIndex) => {
+                const isConnected = connected.has(`${rowIndex}-${colIndex}`);
 
-              return (
-                <button
-                  key={`tile-${rowIndex}-${colIndex}`}
-                  type="button"
-                  onClick={() => handleTileClick(rowIndex, colIndex)}
-                  className="flex items-center justify-center rounded-lg border border-stone-300 bg-white p-1 transition hover:bg-stone-50"
-                  style={{
-                    width: `${TILE_SIZE}px`,
-                    height: `${TILE_SIZE}px`,
-                  }}
-                  aria-label={`Pipe ${rowIndex + 1}, ${colIndex + 1}`}
-                >
-                  {renderPipe(tile, isConnected, rowIndex, colIndex)}
-                </button>
-              );
-            })
-          )}
+                return (
+                  <button
+                    key={`tile-${rowIndex}-${colIndex}`}
+                    type="button"
+                    onClick={() => handleTileClick(rowIndex, colIndex)}
+                    className="flex items-center justify-center rounded-lg border border-stone-300 bg-white p-1 transition hover:bg-stone-50"
+                    style={{
+                      width: `${TILE_SIZE}px`,
+                      height: `${TILE_SIZE}px`,
+                    }}
+                    aria-label={`Pipe ${rowIndex + 1}, ${colIndex + 1}`}
+                  >
+                    {renderPipe(tile, isConnected, rowIndex, colIndex)}
+                  </button>
+                );
+              })
+            )}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={checkAnswer}
+            className="rounded bg-stone-900 px-4 py-2 text-white transition hover:bg-black"
+          >
+            Sjekk svar
+          </button>
+
+          {message && <p className="text-sm text-stone-700">{message}</p>}
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
-        <button
-          type="button"
-          onClick={checkAnswer}
-          className="rounded bg-stone-900 px-4 py-2 text-white transition hover:bg-black"
-        >
-          Sjekk svar
-        </button>
-
-        {message && <p className="text-sm text-stone-700">{message}</p>}
-      </div>
-    </div>
+      <GameSuccessOverlay
+        open={showVictory}
+        title="Gratulerer!"
+        message="Du koblet sammen rørsystemet!"
+        buttonText="OK"
+        onClose={handleCloseVictory}
+      />
+    </>
   );
 }

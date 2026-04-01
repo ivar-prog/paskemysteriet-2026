@@ -1,4 +1,5 @@
 import React, { useMemo, useRef, useState } from "react";
+import GameSuccessOverlay from "../GamesSuccessOverlay";
 
 type BlockEscapeGameProps = {
   onSolved: () => void;
@@ -195,6 +196,7 @@ export default function BlockEscapeGame({
   );
   const [message, setMessage] = useState("");
   const [solved, setSolved] = useState(false);
+  const [showVictory, setShowVictory] = useState(false);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [dragOffset, setDragOffset] = useState<Point>({ x: 0, y: 0 });
   const [dragPosition, setDragPosition] = useState<Point | null>(null);
@@ -213,6 +215,10 @@ export default function BlockEscapeGame({
   const exitWidth = EXIT_WIDTH * CELL_SIZE + (EXIT_WIDTH - 1) * GAP;
 
   function resetGame(): void {
+    if (showVictory) {
+      return;
+    }
+
     setBlocks(cloneBlocks(INITIAL_BLOCKS));
     setMessage("");
     setSolved(false);
@@ -226,8 +232,8 @@ export default function BlockEscapeGame({
     }
 
     setSolved(true);
-    setMessage("Riktig! Den røde klossen kom seg ut.");
-    onSolved();
+    setMessage("");
+    setShowVictory(true);
   }
 
   function moveBlock(blockId: string, nextX: number, nextY: number): void {
@@ -246,7 +252,7 @@ export default function BlockEscapeGame({
   }
 
   function beginDrag(block: Block, clientX: number, clientY: number): void {
-    if (solved || !boardRef.current) {
+    if (solved || showVictory || !boardRef.current) {
       return;
     }
 
@@ -279,7 +285,7 @@ export default function BlockEscapeGame({
   function handlePointerMove(
     event: React.PointerEvent<HTMLButtonElement>
   ): void {
-    if (!draggingId || !boardRef.current) {
+    if (!draggingId || !boardRef.current || showVictory) {
       return;
     }
 
@@ -304,7 +310,7 @@ export default function BlockEscapeGame({
   }
 
   function handlePointerEnd(): void {
-    if (!draggingId) {
+    if (!draggingId || showVictory) {
       return;
     }
 
@@ -333,131 +339,149 @@ export default function BlockEscapeGame({
     }
   }
 
+  function handleCloseVictory(): void {
+    setShowVictory(false);
+    onSolved();
+  }
+
   return (
-    <div className="space-y-4">
-      <p className="text-sm text-stone-700 md:max-w-[600px]">
-        Få den røde klossen ut gjennom åpningen øverst til høyre. Alle klossene
-        kan flyttes både vannrett og loddrett, men bare dit det faktisk er ledig
-        plass. Trykk på en kloss når den bare har ett mulig trekk, eller dra den
-        når du må velge retning.
-      </p>
+    <>
+      <div className="space-y-4">
+        <p className="text-sm text-stone-700 md:max-w-[600px]">
+          Få den røde klossen ut gjennom åpningen øverst til høyre. Alle
+          klossene kan flyttes både vannrett og loddrett, men bare dit det
+          faktisk er ledig plass. Trykk på en kloss når den bare har ett mulig
+          trekk, eller dra den når du må velge retning.
+        </p>
 
-      <div className="flex flex-wrap items-center gap-3">
-        <button
-          type="button"
-          onClick={resetGame}
-          className="rounded bg-stone-900 px-4 py-2 text-white transition hover:bg-black"
-        >
-          Tilbakestill
-        </button>
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={resetGame}
+            className="rounded bg-stone-900 px-4 py-2 text-white transition hover:bg-black"
+          >
+            Tilbakestill
+          </button>
 
-        {message && <p className="text-sm text-stone-700">{message}</p>}
-      </div>
+          {message && <p className="text-sm text-stone-700">{message}</p>}
+        </div>
 
-      <div className="overflow-x-auto">
-        <div
-          ref={boardRef}
-          className="relative mx-auto w-fit"
-          style={{
-            width: `${outerWidth}px`,
-            height: `${outerHeight}px`,
-            touchAction: "none",
-          }}
-        >
-          <div className="absolute inset-0 rounded-[32px] bg-[linear-gradient(145deg,#5a2e12,#3a1f0c)] shadow-[inset_0_4px_12px_rgba(0,0,0,0.6),0_8px_20px_rgba(0,0,0,0.4)]" />
-
+        <div className="overflow-x-auto">
           <div
-            className="absolute rounded-[24px] bg-[linear-gradient(145deg,#6b3a18,#4a2610)] shadow-[inset_0_2px_8px_rgba(0,0,0,0.6)]"
+            ref={boardRef}
+            className="relative mx-auto w-fit"
             style={{
-              left: `${BOARD_PADDING}px`,
-              top: `${BOARD_PADDING + EXIT_HEIGHT}px`,
-              width: `${boardWidth}px`,
-              height: `${boardHeight}px`,
+              width: `${outerWidth}px`,
+              height: `${outerHeight}px`,
+              touchAction: "none",
             }}
           >
+            <div className="absolute inset-0 rounded-[32px] bg-[linear-gradient(145deg,#5a2e12,#3a1f0c)] shadow-[inset_0_4px_12px_rgba(0,0,0,0.6),0_8px_20px_rgba(0,0,0,0.4)]" />
+
             <div
-              className="grid h-full w-full"
+              className="absolute rounded-[24px] bg-[linear-gradient(145deg,#6b3a18,#4a2610)] shadow-[inset_0_2px_8px_rgba(0,0,0,0.6)]"
               style={{
-                gridTemplateColumns: `repeat(${COLS}, ${CELL_SIZE}px)`,
-                gridTemplateRows: `repeat(${ROWS}, ${CELL_SIZE}px)`,
-                gap: `${GAP}px`,
+                left: `${BOARD_PADDING}px`,
+                top: `${BOARD_PADDING + EXIT_HEIGHT}px`,
+                width: `${boardWidth}px`,
+                height: `${boardHeight}px`,
               }}
             >
-              {Array.from({ length: COLS * ROWS }).map((_, index) => (
-                <div
-                  key={`cell-${index}`}
-                  className="rounded-xl border border-black/20 bg-black/10"
-                />
-              ))}
-            </div>
-          </div>
-
-          <div
-            className="absolute z-[1] bg-[#e7dfcc]"
-            style={{
-              left: `${exitLeft}px`,
-              top: "0px",
-              width: `${exitWidth}px`,
-              height: `${BOARD_PADDING + EXIT_HEIGHT + 2}px`,
-              borderBottomLeftRadius: "0px",
-              borderBottomRightRadius: "0px",
-            }}
-          />
-
-          {blocks.map((block) => {
-            const isDragging = draggingId === block.id && dragPosition !== null;
-            const left = isDragging ? dragPosition.x : getPixelX(block.x);
-            const top = isDragging ? dragPosition.y : getPixelY(block.y);
-            const isGoal = block.color === "goal";
-
-            return (
-              <button
-                key={block.id}
-                type="button"
-                onPointerDown={(event) => {
-                  event.preventDefault();
-                  event.currentTarget.setPointerCapture(event.pointerId);
-                  beginDrag(block, event.clientX, event.clientY);
-                }}
-                onPointerMove={handlePointerMove}
-                onPointerUp={handlePointerEnd}
-                onPointerCancel={handlePointerEnd}
-                className={[
-                  "absolute select-none rounded-2xl border-2 shadow-sm",
-                  "transition-[left,top,transform,box-shadow] duration-200 ease-out",
-                  isDragging ? "z-20 scale-[1.02] shadow-lg" : "z-10",
-                  isGoal
-                    ? "border-red-900 bg-[linear-gradient(145deg,#d24a2f,#a8321d)] shadow-[inset_0_2px_6px_rgba(255,255,255,0.25)]"
-                    : "border-[#caa56a] bg-[linear-gradient(145deg,#f2d29b,#d8a85c)] shadow-[inset_0_2px_6px_rgba(255,255,255,0.3)]",
-                ].join(" ")}
+              <div
+                className="grid h-full w-full"
                 style={{
-                  left: `${left}px`,
-                  top: `${top}px`,
-                  width: `${getBlockWidth(block)}px`,
-                  height: `${getBlockHeight(block)}px`,
-                  touchAction: "none",
+                  gridTemplateColumns: `repeat(${COLS}, ${CELL_SIZE}px)`,
+                  gridTemplateRows: `repeat(${ROWS}, ${CELL_SIZE}px)`,
+                  gap: `${GAP}px`,
                 }}
-                aria-label={isGoal ? "Yellow block" : `Blue block ${block.id}`}
               >
-                <div
+                {Array.from({ length: COLS * ROWS }).map((_, index) => (
+                  <div
+                    key={`cell-${index}`}
+                    className="rounded-xl border border-black/20 bg-black/10"
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div
+              className="absolute z-[1] bg-[#e7dfcc]"
+              style={{
+                left: `${exitLeft}px`,
+                top: "0px",
+                width: `${exitWidth}px`,
+                height: `${BOARD_PADDING + EXIT_HEIGHT + 2}px`,
+                borderBottomLeftRadius: "0px",
+                borderBottomRightRadius: "0px",
+              }}
+            />
+
+            {blocks.map((block) => {
+              const isDragging =
+                draggingId === block.id && dragPosition !== null;
+              const left = isDragging ? dragPosition.x : getPixelX(block.x);
+              const top = isDragging ? dragPosition.y : getPixelY(block.y);
+              const isGoal = block.color === "goal";
+
+              return (
+                <button
+                  key={block.id}
+                  type="button"
+                  onPointerDown={(event) => {
+                    event.preventDefault();
+                    event.currentTarget.setPointerCapture(event.pointerId);
+                    beginDrag(block, event.clientX, event.clientY);
+                  }}
+                  onPointerMove={handlePointerMove}
+                  onPointerUp={handlePointerEnd}
+                  onPointerCancel={handlePointerEnd}
                   className={[
-                    "absolute inset-[4px] rounded-xl",
-                    isGoal ? "bg-white/10" : "bg-white/15",
-                  ].join(" ")}
-                />
-                <div
-                  className={[
-                    "absolute inset-0 rounded-2xl",
+                    "absolute select-none rounded-2xl border-2 shadow-sm",
+                    "transition-[left,top,transform,box-shadow] duration-200 ease-out",
+                    isDragging ? "z-20 scale-[1.02] shadow-lg" : "z-10",
                     isGoal
-                      ? "shadow-[inset_0_1px_0_rgba(255,255,255,0.5)]"
-                      : "shadow-[inset_0_1px_0_rgba(255,255,255,0.35)]",
+                      ? "border-red-900 bg-[linear-gradient(145deg,#d24a2f,#a8321d)] shadow-[inset_0_2px_6px_rgba(255,255,255,0.25)]"
+                      : "border-[#caa56a] bg-[linear-gradient(145deg,#f2d29b,#d8a85c)] shadow-[inset_0_2px_6px_rgba(255,255,255,0.3)]",
                   ].join(" ")}
-                />
-              </button>
-            );
-          })}
+                  style={{
+                    left: `${left}px`,
+                    top: `${top}px`,
+                    width: `${getBlockWidth(block)}px`,
+                    height: `${getBlockHeight(block)}px`,
+                    touchAction: "none",
+                  }}
+                  aria-label={
+                    isGoal ? "Yellow block" : `Blue block ${block.id}`
+                  }
+                >
+                  <div
+                    className={[
+                      "absolute inset-[4px] rounded-xl",
+                      isGoal ? "bg-white/10" : "bg-white/15",
+                    ].join(" ")}
+                  />
+                  <div
+                    className={[
+                      "absolute inset-0 rounded-2xl",
+                      isGoal
+                        ? "shadow-[inset_0_1px_0_rgba(255,255,255,0.5)]"
+                        : "shadow-[inset_0_1px_0_rgba(255,255,255,0.35)]",
+                    ].join(" ")}
+                  />
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
-    </div>
+
+      <GameSuccessOverlay
+        open={showVictory}
+        title="Gratulerer!"
+        message="Du fikk klossen ut!"
+        buttonText="OK"
+        onClose={handleCloseVictory}
+      />
+    </>
   );
 }

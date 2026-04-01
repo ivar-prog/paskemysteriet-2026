@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import GameSuccessOverlay from "../GamesSuccessOverlay";
 
 type BinairoGameProps = {
   onSolved: () => void;
@@ -15,7 +16,6 @@ type Constraint = {
 };
 
 const GRID_SIZE = 8;
-// const CELL_SIZE = 64;
 
 const START_BOARD: CellState[][] = [
   ["empty", "black", "empty", "empty", "white", "empty", "empty", "empty"],
@@ -27,17 +27,6 @@ const START_BOARD: CellState[][] = [
   ["empty", "white", "empty", "white", "empty", "empty", "empty", "empty"],
   ["empty", "empty", "empty", "white", "empty", "empty", "black", "empty"],
 ];
-
-/* const SOLUTION: CellState[][] = [
-  ["black", "black", "white", "black", "white", "black", "white", "white"],
-  ["white", "white", "black", "black", "white", "white", "black", "black"],
-  ["white", "black", "white", "white", "black", "black", "white", "black"],
-  ["black", "white", "white", "black", "black", "white", "black", "white"],
-  ["black", "white", "black", "white", "white", "black", "white", "black"],
-  ["white", "black", "white", "black", "white", "black", "black", "white"],
-  ["black", "white", "black", "white", "black", "white", "white", "black"],
-  ["white", "black", "black", "white", "black", "white", "black", "white"],
-]; */
 
 const CONSTRAINTS: Constraint[] = [
   { row: 1, col: 0, direction: "vertical", type: "equal" },
@@ -189,10 +178,10 @@ export default function BinairoGame({
 }: BinairoGameProps): React.JSX.Element {
   const [board, setBoard] = useState<CellState[][]>(createBoard);
   const [message, setMessage] = useState("");
-  const [hasSolved, setHasSolved] = useState(false);
+  const [showVictory, setShowVictory] = useState(false);
 
   function handleCellClick(row: number, col: number): void {
-    if (isGivenCell(row, col)) {
+    if (showVictory || isGivenCell(row, col)) {
       return;
     }
 
@@ -208,114 +197,127 @@ export default function BinairoGame({
     const solved = isBoardSolved(board);
 
     if (solved) {
-      setMessage("Riktig! Binairo-brettet er løst.");
-      if (!hasSolved) {
-        setHasSolved(true);
-        onSolved();
-      }
+      setMessage("");
+      setShowVictory(true);
       return;
     }
 
     setMessage("Ikke helt riktig ennå.");
   }
 
-  return (
-    <div className="space-y-4">
-      <p className="text-sm text-stone-700 md:max-w-[600px]">
-        Klikk på en tom rute for å sette inn en svart sirkel. Klikk igjen for å
-        bytte til hvit, og én gang til for å tømme ruten. Hver rad og kolonne må
-        ha like mange svarte og hvite sirkler, aldri tre like på rad, og tegnene
-        mellom rutene må stemme.
-      </p>
+  function handleCloseVictory(): void {
+    setShowVictory(false);
+    onSolved();
+  }
 
-      <div className="overflow-x-auto">
-        <div className="mx-auto w-full max-w-[720px]">
-          <div
-            className="relative mx-auto w-fit border border-stone-300 bg-stone-100 p-4 sm:p-8"
-            style={{ width: "100%" }}
-          >
+  return (
+    <>
+      <div className="space-y-4">
+        <p className="text-sm text-stone-700 md:max-w-[600px]">
+          Klikk på en tom rute for å sette inn en svart sirkel. Klikk igjen for
+          å bytte til hvit, og én gang til for å tømme ruten. Hver rad og
+          kolonne må ha like mange svarte og hvite sirkler. Det er maks to av
+          samme farge på rad. <strong>=</strong> Betyr samme farge,{" "}
+          <strong>X</strong> betyr ulik farge.
+        </p>
+
+        <div className="overflow-x-auto">
+          <div className="mx-auto w-full max-w-[720px]">
             <div
-              className="relative mx-auto aspect-square w-full max-w-[512px] border border-stone-300 bg-stone-100"
-              style={{
-                display: "grid",
-                gridTemplateColumns: `repeat(${GRID_SIZE}, minmax(0, 1fr))`,
-                gridTemplateRows: `repeat(${GRID_SIZE}, minmax(0, 1fr))`,
-              }}
+              className="relative mx-auto w-fit border border-stone-300 bg-stone-100 p-4 sm:p-8"
+              style={{ width: "100%" }}
             >
-              {board.map((row, rowIndex) =>
-                row.map((cell, colIndex) => {
-                  const given = isGivenCell(rowIndex, colIndex);
+              <div
+                className="relative mx-auto aspect-square w-full max-w-[512px] border border-stone-300 bg-stone-100"
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: `repeat(${GRID_SIZE}, minmax(0, 1fr))`,
+                  gridTemplateRows: `repeat(${GRID_SIZE}, minmax(0, 1fr))`,
+                }}
+              >
+                {board.map((row, rowIndex) =>
+                  row.map((cell, colIndex) => {
+                    const given = isGivenCell(rowIndex, colIndex);
+
+                    return (
+                      <button
+                        key={`cell-${rowIndex}-${colIndex}`}
+                        type="button"
+                        onClick={() => handleCellClick(rowIndex, colIndex)}
+                        className="relative flex aspect-square items-center justify-center border-r border-b border-stone-300 bg-stone-100"
+                        style={{
+                          borderTop:
+                            rowIndex === 0
+                              ? "1px solid rgb(212 212 216)"
+                              : undefined,
+                          borderLeft:
+                            colIndex === 0
+                              ? "1px solid rgb(212 212 216)"
+                              : undefined,
+                          cursor: showVictory || given ? "default" : "pointer",
+                        }}
+                        aria-label={`Cell ${rowIndex + 1}, ${colIndex + 1}`}
+                      >
+                        <div className="scale-[0.72] sm:scale-100">
+                          {renderCircle(cell, given)}
+                        </div>
+                      </button>
+                    );
+                  })
+                )}
+
+                {CONSTRAINTS.map((constraint, index) => {
+                  const left =
+                    constraint.direction === "horizontal"
+                      ? `calc(${((constraint.col + 1) / GRID_SIZE) * 100}%)`
+                      : `calc(${((constraint.col + 0.5) / GRID_SIZE) * 100}%)`;
+                  const top =
+                    constraint.direction === "horizontal"
+                      ? `calc(${((constraint.row + 0.5) / GRID_SIZE) * 100}%)`
+                      : `calc(${((constraint.row + 1) / GRID_SIZE) * 100}%)`;
 
                   return (
-                    <button
-                      key={`cell-${rowIndex}-${colIndex}`}
-                      type="button"
-                      onClick={() => handleCellClick(rowIndex, colIndex)}
-                      className="relative flex aspect-square items-center justify-center border-r border-b border-stone-300 bg-stone-100"
+                    <div
+                      key={`constraint-${index}`}
+                      className="pointer-events-none absolute flex h-10 w-6 items-center justify-center sm:h-14 sm:w-8"
                       style={{
-                        borderTop:
-                          rowIndex === 0
-                            ? "1px solid rgb(212 212 216)"
-                            : undefined,
-                        borderLeft:
-                          colIndex === 0
-                            ? "1px solid rgb(212 212 216)"
-                            : undefined,
-                        cursor: given ? "default" : "pointer",
+                        left,
+                        top,
+                        transform:
+                          constraint.direction === "horizontal"
+                            ? "translate(-50%, -50%) translateX(-2px)"
+                            : "translate(-50%, -50%) translateY(-2px)",
                       }}
-                      aria-label={`Cell ${rowIndex + 1}, ${colIndex + 1}`}
                     >
-                      <div className="scale-[0.72] sm:scale-100">
-                        {renderCircle(cell, given)}
-                      </div>
-                    </button>
+                      {renderConstraintSymbol(constraint.type)}
+                    </div>
                   );
-                })
-              )}
-
-              {CONSTRAINTS.map((constraint, index) => {
-                const left =
-                  constraint.direction === "horizontal"
-                    ? `calc(${((constraint.col + 1) / GRID_SIZE) * 100}%)`
-                    : `calc(${((constraint.col + 0.5) / GRID_SIZE) * 100}%)`;
-                const top =
-                  constraint.direction === "horizontal"
-                    ? `calc(${((constraint.row + 0.5) / GRID_SIZE) * 100}%)`
-                    : `calc(${((constraint.row + 1) / GRID_SIZE) * 100}%)`;
-
-                return (
-                  <div
-                    key={`constraint-${index}`}
-                    className="pointer-events-none absolute flex h-10 w-6 items-center justify-center sm:h-14 sm:w-8"
-                    style={{
-                      left,
-                      top,
-                      transform:
-                        constraint.direction === "horizontal"
-                          ? "translate(-50%, -50%) translateX(-2px)"
-                          : "translate(-50%, -50%) translateY(-2px)",
-                    }}
-                  >
-                    {renderConstraintSymbol(constraint.type)}
-                  </div>
-                );
-              })}
+                })}
+              </div>
             </div>
           </div>
         </div>
+
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={checkAnswer}
+            className="rounded bg-stone-900 px-4 py-2 text-white transition hover:bg-black"
+          >
+            Sjekk svar
+          </button>
+
+          {message && <p className="text-sm text-stone-700">{message}</p>}
+        </div>
       </div>
 
-      <div className="flex items-center gap-3">
-        <button
-          type="button"
-          onClick={checkAnswer}
-          className="rounded bg-stone-900 px-4 py-2 text-white transition hover:bg-black"
-        >
-          Sjekk svar
-        </button>
-
-        {message && <p className="text-sm text-stone-700">{message}</p>}
-      </div>
-    </div>
+      <GameSuccessOverlay
+        open={showVictory}
+        title="Gratulerer!"
+        message="Du løste Binairo-brettet!"
+        buttonText="OK"
+        onClose={handleCloseVictory}
+      />
+    </>
   );
 }

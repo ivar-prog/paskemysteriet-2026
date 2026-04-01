@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import GameSuccessOverlay from "../GamesSuccessOverlay";
 
 type SudokuGameProps = {
   onSolved: () => void;
@@ -50,6 +51,7 @@ export default function SudokuGame({
   const [highlightedNumber, setHighlightedNumber] = useState<number | null>(
     null
   );
+  const [showVictory, setShowVictory] = useState(false);
 
   const fixedCells = useMemo<boolean[][]>(
     () => STARTING_BOARD.map((row) => row.map((value) => value !== 0)),
@@ -57,7 +59,7 @@ export default function SudokuGame({
   );
 
   function handleChange(row: number, col: number, value: string): void {
-    if (fixedCells[row][col]) return;
+    if (showVictory || fixedCells[row][col]) return;
 
     if (!/^[1-9]?$/.test(value)) return;
 
@@ -73,8 +75,8 @@ export default function SudokuGame({
     );
 
     if (isCorrect) {
-      setMessage("Alt er riktig! Sudokuen er løst.");
-      onSolved();
+      setMessage("");
+      setShowVictory(true);
       return;
     }
 
@@ -82,11 +84,18 @@ export default function SudokuGame({
   }
 
   function handleHighlightNumber(num: number): void {
+    if (showVictory) return;
+
     setHighlightedNumber(num);
 
     window.setTimeout(() => {
       setHighlightedNumber((current) => (current === num ? null : current));
     }, 1500);
+  }
+
+  function handleCloseVictory(): void {
+    setShowVictory(false);
+    onSolved();
   }
 
   const completedNumbers = useMemo(() => {
@@ -98,84 +107,94 @@ export default function SudokuGame({
   }, [board]);
 
   return (
-    <div className="space-y-4">
-      <p className="text-sm text-stone-700 md:max-w-[600px]">
-        Fyll inn Sudokuen. De grønne tallene er låst. Når du tror du er ferdig,
-        trykk <span className="font-semibold">Sjekk svar</span>.
-      </p>
+    <>
+      <div className="space-y-4">
+        <p className="text-sm text-stone-700 md:max-w-[600px]">
+          Fyll inn Sudokuen. De grønne tallene er låst. Når du tror du er
+          ferdig, trykk <span className="font-semibold">Sjekk svar</span>.
+        </p>
 
-      <div className="mx-auto w-fit rounded-xl border border-stone-500 bg-stone-200 p-2">
-        <div className="grid grid-cols-9">
-          {board.map((row, rowIndex) =>
-            row.map((cell, colIndex) => {
-              const isFixed = fixedCells[rowIndex][colIndex];
-              const thickRight = (colIndex + 1) % 3 === 0 && colIndex !== 8;
-              const thickBottom = (rowIndex + 1) % 3 === 0 && rowIndex !== 8;
-              const isHighlighted =
-                highlightedNumber !== null && cell === highlightedNumber;
+        <div className="mx-auto w-fit rounded-xl border border-stone-500 bg-stone-200 p-2">
+          <div className="grid grid-cols-9">
+            {board.map((row, rowIndex) =>
+              row.map((cell, colIndex) => {
+                const isFixed = fixedCells[rowIndex][colIndex];
+                const thickRight = (colIndex + 1) % 3 === 0 && colIndex !== 8;
+                const thickBottom = (rowIndex + 1) % 3 === 0 && rowIndex !== 8;
+                const isHighlighted =
+                  highlightedNumber !== null && cell === highlightedNumber;
 
-              return (
-                <input
-                  key={`${rowIndex}-${colIndex}`}
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[1-9]*"
-                  maxLength={1}
-                  value={cell === 0 ? "" : cell}
-                  onChange={(e) =>
-                    handleChange(rowIndex, colIndex, e.target.value)
-                  }
-                  readOnly={isFixed}
-                  className={[
-                    "h-9 w-9 border border-stone-400 text-center text-base outline-none transition sm:h-10 sm:w-10 sm:text-lg md:h-11 md:w-11",
-                    isFixed
-                      ? "bg-green-100 font-semibold text-green-800"
-                      : "bg-white text-stone-900",
-                    isHighlighted ? "bg-yellow-200" : "",
-                    thickRight ? "border-r-4 border-r-stone-700" : "",
-                    thickBottom ? "border-b-4 border-b-stone-700" : "",
-                  ].join(" ")}
-                />
-              );
-            })
-          )}
+                return (
+                  <input
+                    key={`${rowIndex}-${colIndex}`}
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[1-9]*"
+                    maxLength={1}
+                    value={cell === 0 ? "" : cell}
+                    onChange={(e) =>
+                      handleChange(rowIndex, colIndex, e.target.value)
+                    }
+                    readOnly={isFixed || showVictory}
+                    className={[
+                      "h-9 w-9 border border-stone-400 text-center text-base outline-none transition sm:h-10 sm:w-10 sm:text-lg md:h-11 md:w-11",
+                      isFixed
+                        ? "bg-green-100 font-semibold text-green-800"
+                        : "bg-white text-stone-900",
+                      isHighlighted ? "bg-yellow-200" : "",
+                      thickRight ? "border-r-4 border-r-stone-700" : "",
+                      thickBottom ? "border-b-4 border-b-stone-700" : "",
+                    ].join(" ")}
+                  />
+                );
+              })
+            )}
+          </div>
+        </div>
+
+        <div className="flex w-full justify-between px-2">
+          {Array.from({ length: 9 }, (_, index) => index + 1).map((num) => {
+            const isComplete = completedNumbers[num];
+
+            return (
+              <button
+                key={num}
+                type="button"
+                onClick={() => handleHighlightNumber(num)}
+                disabled={isComplete || showVictory}
+                className={[
+                  "flex h-8 w-8 items-center justify-center rounded border text-sm font-semibold transition sm:text-base",
+                  isComplete || showVictory
+                    ? "cursor-not-allowed border-stone-300 bg-stone-300 text-stone-500"
+                    : "border-stone-700 bg-white text-stone-900 hover:scale-105 hover:bg-stone-100",
+                ].join(" ")}
+              >
+                {num}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={checkAnswer}
+            className="rounded-lg bg-stone-900 px-4 py-2 text-white transition hover:bg-black"
+          >
+            Sjekk svar
+          </button>
+
+          {message && <p className="text-sm text-stone-700">{message}</p>}
         </div>
       </div>
 
-      <div className="flex w-full justify-between px-2">
-        {Array.from({ length: 9 }, (_, index) => index + 1).map((num) => {
-          const isComplete = completedNumbers[num];
-
-          return (
-            <button
-              key={num}
-              type="button"
-              onClick={() => handleHighlightNumber(num)}
-              disabled={isComplete}
-              className={[
-                "flex h-8 w-8 items-center justify-center rounded border text-sm font-semibold transition sm:text-base",
-                isComplete
-                  ? "cursor-not-allowed border-stone-300 bg-stone-300 text-stone-500"
-                  : "border-stone-700 bg-white text-stone-900 hover:scale-105 hover:bg-stone-100",
-              ].join(" ")}
-            >
-              {num}
-            </button>
-          );
-        })}
-      </div>
-
-      <div className="flex items-center gap-3">
-        <button
-          type="button"
-          onClick={checkAnswer}
-          className="rounded-lg bg-stone-900 px-4 py-2 text-white transition hover:bg-black"
-        >
-          Sjekk svar
-        </button>
-
-        {message && <p className="text-sm text-stone-700">{message}</p>}
-      </div>
-    </div>
+      <GameSuccessOverlay
+        open={showVictory}
+        title="Gratulerer!"
+        message="Du løste sudokuen!"
+        buttonText="OK"
+        onClose={handleCloseVictory}
+      />
+    </>
   );
 }
